@@ -1,0 +1,36 @@
+---
+- hosts: eoi-server2
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: hacer un ping
+      ping:
+        
+    - name: mostrar el nombre de la máquina
+      debug:
+        msg: "Nombre de la máquina {{ ansible_hostname }}"
+
+    - name: Hacer un git clone del repo
+      git:
+        repo: https://github.com/EliasLopezBouzid/my-first-blog.git
+        dest: "{{project_path}}"
+        force: true
+
+    - name: Crear entorno virtual e instalar requirements
+      pip:
+        requirements: "{{project_path}}/requirements.txt"
+        virtualenv: "{{venv}}"
+
+    - name: Hacer y aplicar migraciones Django
+      community.general.django_manage:
+        command: migrate
+        project_path: "{{project_path}}"
+        virtualenv: "{{venv}}"
+
+    - name: Cargar datos inciales en la base de datos
+      community.general.django_manage:
+        command: loaddata
+        project_path: "{{project_path}}"
+        fixtures: "{{project_path}}/db.json"
+        virtualenv: "{{venv}}"
