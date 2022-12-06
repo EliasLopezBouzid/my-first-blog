@@ -1,5 +1,5 @@
 ---
-- hosts: eoi-server2
+- hosts: eoi-server1
   vars_files:
     - vars.yml
 
@@ -23,14 +23,29 @@
         virtualenv: "{{venv}}"
 
     - name: Hacer y aplicar migraciones Django
-      community.general.django_manage:
+      django_manage:
         command: migrate
         project_path: "{{project_path}}"
         virtualenv: "{{venv}}"
 
     - name: Cargar datos inciales en la base de datos
-      community.general.django_manage:
+      django_manage:
         command: loaddata
         project_path: "{{project_path}}"
         fixtures: "{{project_path}}/db.json"
         virtualenv: "{{venv}}"
+
+    - name: Comprobando si superuser admin existe
+      django_manage:
+        command: shell -c 'import sys; from django.contrib.auth.models import User; sys.exit(0 if User.objects.filter(username="admin").count() > 0 else 1)'
+        virtualenv: "{{venv}}"
+        project_path: "{{project_path}}" 
+      register: checksuperuser
+
+    - name: Creando superusergit admin (Sin password)
+      django_manage:
+        command: "createsuperuser --noinput --username=admin2 --email=e.lopezbouzid.com DJANGO_SUPERUSER_PASSWORD=12345"
+        project_path: "{{project_path}}"
+        virtualenv: "{{venv}}"
+      when: checksuperuser.out|trim == "0"
+

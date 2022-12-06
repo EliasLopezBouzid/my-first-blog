@@ -40,6 +40,12 @@ def load_data():
     
     with lcd(PROJECT_PATH):
         local(f'{PYTHON_VENV} manage.py migrate')
+        
+def create_superuser():
+    print('creating superuser...')
+    
+    with lcd(PROJECT_PATH):
+        local('DJANGO_SUPERUSER_PASSWORD=12345 python manage.py createsuperuser --noinput --username admin --email e.lopezbouzid@gmail.com')
 
 def deploy():
     git_clone()
@@ -47,4 +53,5 @@ def deploy():
     install_requirements()
     run_migrations()
     load_data()
+    create_superuser()
     

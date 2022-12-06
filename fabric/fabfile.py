@@ -9,6 +9,9 @@ PROJECT_NAME = 'my-first-blog'
 PROJECT_PATH = f'/home/elias/sistemas/{PROJECT_NAME}'
 PYTHON_VENV = f'{PROJECT_PATH}/.venv/bin/python3'
 PIP_VENV = f'{PROJECT_PATH}/.venv/bin/pip'
+DJANGO_SUPERUSER_PASSWORD='12345'
+DJANGO_SUPERUSER_USERNAME='admin'
+DJANGO_SUPERUSER_EMAIL='e.lopezbouzid@gmail.com'
 
 def git_clone():
     print(f'git clone {PROJECT_REPO}...')
@@ -44,8 +47,17 @@ def load_data():
     with cd(PROJECT_PATH):
         run(f'{PYTHON_VENV} manage.py loaddata db.json')
         
+def create_superuser():
+    print('creating superuser...')
+    
+    with cd(PROJECT_PATH):
+        try:
+            run(f'DJANGO_SUPERUSER_PASSWORD=12345 {PYTHON_VENV} manage.py createsuperuser --noinput --username {DJANGO_SUPERUSER_USERNAME} --email {DJANGO_SUPERUSER_EMAIL}')
+        except:
+            print("This Superuser is already created, Skipping this step")
+        
 def runserver():
-    print('runing server...')
+    print('running server...')
     
     with cd(PROJECT_PATH):
         run(f'{PYTHON_VENV} manage.py runserver')
@@ -56,4 +68,5 @@ def deploy():
     install_requirements()
     run_migrations()
     load_data()
+    create_superuser()
     runserver()
