@@ -42,7 +42,7 @@
         project_path: "{{project_path}}" 
       register: checksuperuser
 
-    - name: Creando superusergit admin (Sin password)
+    - name: Creando superuser admin (Sin password)
       django_manage:
         command: "createsuperuser --noinput --username=admin2 --email=e.lopezbouzid.com DJANGO_SUPERUSER_PASSWORD=12345"
         project_path: "{{project_path}}"
